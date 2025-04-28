@@ -1,84 +1,99 @@
 <?php
 session_start();
-$productos_deseados = $_SESSION['deseos'] ?? [];
+include 'conexion.php';
+
+$deseos = $_SESSION['deseos'] ?? [];
+
+if (empty($deseos)) {
+    echo "<script>alert('No tienes productos en tu lista de deseos'); window.location='tienda.php';</script>";
+    exit();
+}
+
+// Si se pidió eliminar un producto
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar'])) {
+    $idEliminar = $_POST['id_prod'] ?? '';
+    if (!empty($idEliminar)) {
+        unset($_SESSION['deseos'][$idEliminar]);
+        header('Location: deseos.php');
+        exit();
+    }
+}
+
+// Obtener los ids de productos en deseos
+$ids = implode(',', array_keys($deseos));
+
+// Traer los productos desde la base de datos
+$consulta = $conexion->query("SELECT id_prod, nombre_prod, precio, ruta_preview, tipo_prod FROM producto WHERE id_prod IN ($ids)");
+
+$productos = [];
+while ($row = $consulta->fetch_assoc()) {
+    $productos[] = $row;
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Lista de Deseos | MediaShop</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>Mis Deseos | MediaShop</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fff; color: #333; }
-        .main-bar { background: #e0e0e0; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .icons i { margin-left: 20px; cursor: pointer; }
-        .detalle { display: flex; gap: 40px; padding: 40px; flex-wrap: wrap; }
-        .detalle img { width: 300px; border-radius: 10px; }
-        .detalle h2 { margin: 0 0 10px; }
-        .calidades label { margin-right: 10px; }
-        .btn-carrito { margin-top: 15px; padding: 10px 20px; background: #6a0dad; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        .corazon { font-size: 24px; color: gray; cursor: pointer; transition: 0.2s; }
-        .corazon.activo { color: red; }
-        .barra-audio {
-            margin-top: 15px;
-            width: 300px;
-            height: 10px;
-            background: #ddd;
-            position: relative;
-            border-radius: 5px;
-        }
-        .barra-audio::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            height: 100%;
-            width: 30%;
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #fff; color: #333; }
+        .producto { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 10px; display: flex; gap: 20px; align-items: center; }
+        .producto img { width: 100px; height: 100px; object-fit: cover; border-radius: 5px; }
+        .producto-info { flex-grow: 1; }
+        .producto-info h3 { margin: 0 0 10px; }
+        .producto-info p { margin: 5px 0; }
+        .botones { display: flex; gap: 10px; margin-top: 10px; }
+        .botones a, .botones button {
+            padding: 8px 15px;
             background: #6a0dad;
+            color: white;
+            border: none;
+            text-decoration: none;
             border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
         }
+        .botones button {
+            background: #e63946;
+        }
+        .volver { margin-top: 20px; display: inline-block; padding: 10px 20px; background: #6a0dad; color: white; text-decoration: none; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-<div class="main-bar">
-    <h1>MediaShop</h1>
-    <div class="icons">
-        <i class="fas fa-search" onclick="location.href='tienda.php'"></i>
-        <i class="fas fa-user" onclick="location.href='perfil.php'"></i>
-        <i class="fas fa-heart" onclick="location.href='deseos.php'"></i>
-        <i class="fas fa-shopping-cart" onclick="location.href='carrito.php'"></i>
-        <i class="fas fa-download" onclick="location.href='descargas.php'"></i>
-    </div>
-</div>
+<h1>Mis Productos en Deseo</h1>
 
-<div class="detalle">
-    <?php if (empty($productos_deseados)): ?>
-        <p>No tienes productos en tu lista de deseos.</p>
-    <?php else: ?>
-        <?php foreach ($productos_deseados as $producto): ?>
-            <div class="preview">
-                <img src="<?= $producto['img'] ?>" alt="<?= $producto['nombre'] ?>">
-                <h3><?= $producto['nombre'] ?></h3>
-                <p>Precio: $10</p>
+<?php foreach ($productos as $prod): ?>
+    <div class="producto">
+        <img src="<?= htmlspecialchars($prod['ruta_preview']) ?>" alt="<?= htmlspecialchars($prod['nombre_prod']) ?>">
+        <div class="producto-info">
+            <h3><?= htmlspecialchars($prod['nombre_prod']) ?></h3>
+            <p>Precio: $<?= htmlspecialchars($prod['precio']) ?></p>
+            <div class="botones">
                 <?php
-                    $archivo_detalle = '';
-                    if ($producto['tipo'] === 'audio') {
-                        $archivo_detalle = 'detalle_audio.php';
-                    } elseif ($producto['tipo'] === 'imagen') {
-                        $archivo_detalle = 'detalle_imagen.php';
-                    } elseif ($producto['tipo'] === 'video') {
-                        $archivo_detalle = 'detalle_video.php';
+                    // Determinar a qué página ir según el tipo de producto
+                    $detallePage = '';
+                    if ($prod['tipo_prod'] === 'audio') {
+                        $detallePage = 'detalle_audio.php';
+                    } elseif ($prod['tipo_prod'] === 'video') {
+                        $detallePage = 'detalle_video.php';
+                    } elseif ($prod['tipo_prod'] === 'imagen') {
+                        $detallePage = 'detalle_imagen.php';
                     }
                 ?>
-                <?php if ($archivo_detalle): ?>
-                    <form method="POST" action="<?= $archivo_detalle ?>?id=<?= $producto['id'] ?>">
-                        <button type="submit" class="btn-carrito">Ver detalles</button>
-                    </form>
-                <?php endif; ?>
+                <a href="<?= $detallePage ?>?id=<?= $prod['id_prod'] ?>">Ver detalles</a>
+
+                <form method="POST" style="display:inline;">
+                    <input type="hidden" name="id_prod" value="<?= $prod['id_prod'] ?>">
+                    <button type="submit" name="eliminar">Eliminar</button>
+                </form>
             </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</div>
+        </div>
+    </div>
+<?php endforeach; ?>
+
+<a href="tienda.php" class="volver">Volver a la tienda</a>
 
 </body>
 </html>

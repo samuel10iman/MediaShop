@@ -1,60 +1,47 @@
-
-
 <?php
 session_start();
+include 'conexion.php';
 
-// Archivo: detalle_imagen.php
-$id = $_GET['id'] ?? 0;
-$tipo = 'imagen';
+$id = $_GET['id'] ?? '';
 
-$imagenes = [
-    ['tipo' => 'imagen', 'categoria' => 'NATURALEZA', 'id' => 101, 'nombre' => 'Montanas', 'img' => 'imagenes/categorias/imagenes/naturaleza/montanas.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'NATURALEZA', 'id' => 102, 'nombre' => 'Bosque', 'img' => 'imagenes/categorias/imagenes/naturaleza/bosque.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'NATURALEZA', 'id' => 103, 'nombre' => 'Desierto', 'img' => 'imagenes/categorias/imagenes/naturaleza/desierto.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'EDUCACION', 'id' => 104, 'nombre' => 'Colegio', 'img' => 'imagenes/categorias/imagenes/educacion/colegios.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'EDUCACION', 'id' => 105, 'nombre' => 'Profesor', 'img' => 'imagenes/categorias/imagenes/educacion/profesor.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'EDUCACION', 'id' => 106, 'nombre' => 'Libro', 'img' => 'imagenes/categorias/imagenes/educacion/libro.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'COMIDA Y BEBIDAS', 'id' => 107, 'nombre' => 'Gaseosa', 'img' => 'imagenes/categorias/imagenes/comidasybebidas/gaseosa.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'COMIDA Y BEBIDAS', 'id' => 108, 'nombre' => 'Lomo saltado', 'img' => 'imagenes/categorias/imagenes/comidasybebidas/lomos.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'COMIDA Y BEBIDAS', 'id' => 109, 'nombre' => 'Choripan', 'img' => 'imagenes/categorias/imagenes/comidasybebidas/choripan.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'DEPORTES', 'id' => 110, 'nombre' => 'Fútbol', 'img' => 'imagenes/categorias/imagenes/deportes/futbol.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'DEPORTES', 'id' => 111, 'nombre' => 'Natación', 'img' => 'imagenes/categorias/imagenes/deportes/natacion.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'DEPORTES', 'id' => 112, 'nombre' => 'Balonmano', 'img' => 'imagenes/categorias/imagenes/deportes/balonmano.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'ARQUITECTURA', 'id' => 113, 'nombre' => 'Templo antiguo', 'img' => 'imagenes/categorias/imagenes/arquitectura/temploantiguo.png'],
-    ['tipo' => 'imagen', 'categoria' => 'ARQUITECTURA', 'id' => 114, 'nombre' => 'Gótico', 'img' => 'imagenes/categorias/imagenes/arquitectura/gotico.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'ARQUITECTURA', 'id' => 115, 'nombre' => 'Coliseo romano', 'img' => 'imagenes/categorias/imagenes/arquitectura/coliseor.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'CIENCIA Y MEDICINA', 'id' => 116, 'nombre' => 'Virus', 'img' => 'imagenes/categorias/imagenes/cienciaymedicina/virus.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'CIENCIA Y MEDICINA', 'id' => 117, 'nombre' => 'Inyección', 'img' => 'imagenes/categorias/imagenes/cienciaymedicina/inyeccion.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'CIENCIA Y MEDICINA', 'id' => 118, 'nombre' => 'Doctor', 'img' => 'imagenes/categorias/imagenes/cienciaymedicina/doctor.jpg']
-];
+if (!empty($id)) {
+    // Realizar la consulta a la base de datos
+    $consulta = $conexion->prepare("SELECT * FROM producto WHERE id_prod = ? AND tipo_prod = 'imagen'");
+    $consulta->bind_param('i', $id);
+    $consulta->execute();
+    $resultado = $consulta->get_result();
 
-$producto = null;
-foreach ($imagenes as $p) {
-    if ($p['id'] == $id && $p['tipo'] == $tipo) {
-        $producto = $p;
-        break;
+    if ($resultado->num_rows > 0) {
+        $producto = $resultado->fetch_assoc();
+        $nombre = htmlspecialchars($producto['descripcion']);
+        $descripcion = htmlspecialchars($producto['descripcion']);
+        $precio = htmlspecialchars($producto['precio']);
+        $ruta = htmlspecialchars($producto['ruta_archivo']); // archivo real (imagen grande)
+        $id_prod = $producto['id_prod'];
+    } else {
+        echo "<script>alert('Producto no encontrado'); window.location='tienda.php';</script>";
+        exit();
     }
-}
-
-if (!$producto) {
-    echo "<script>alert('Producto no encontrado'); window.location='tienda.php';</script>";
+} else {
+    echo "<script>alert('ID no válido'); window.location='tienda.php';</script>";
     exit();
 }
 
 // Manejar lista de deseos
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'add') {
-        $_SESSION['deseos'][$producto['id']] = $producto;
+        $_SESSION['deseos'][$id_prod] = $producto;
     } elseif ($_POST['action'] === 'remove') {
-        unset($_SESSION['deseos'][$producto['id']]);
+        unset($_SESSION['deseos'][$id_prod]);
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title><?= $producto['nombre'] ?> | MediaShop</title>
+    <title><?= $nombre ?> | MediaShop</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fff; color: #333; }
@@ -84,18 +71,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 <div class="detalle">
     <div class="preview">
-        <img src="<?= $producto['img'] ?>" alt="<?= $producto['nombre'] ?>">
+        <img src="<?= $ruta ?>" alt="<?= $nombre ?>">
     </div>
     <div>
-        <p>ID: <?= $producto['id'] ?></p>
-        <h2><?= $producto['nombre'] ?></h2>
+        <p>ID: <?= $id_prod ?></p>
+        <h2><?= $nombre ?></h2>
         <form method="POST">
-            <input type="hidden" name="action" value="<?= isset($_SESSION['deseos'][$producto['id']]) ? 'remove' : 'add' ?>">
-            <button type="submit" class="corazon" style="color: <?= isset($_SESSION['deseos'][$producto['id']]) ? 'red' : 'gray' ?>;">
+            <input type="hidden" name="action" value="<?= isset($_SESSION['deseos'][$id_prod]) ? 'remove' : 'add' ?>">
+            <button type="submit" class="corazon" style="color: <?= isset($_SESSION['deseos'][$id_prod]) ? 'red' : 'gray' ?>;">
                 <i class="fas fa-heart"></i>
             </button>
         </form>
-        <p>Precio: $5</p>
+        <p>Precio: $<?= $precio ?></p>
         <div class="calidades">
             <label><input type="radio" name="calidad"> Web</label>
             <label><input type="radio" name="calidad"> HD</label>

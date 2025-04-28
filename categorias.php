@@ -1,57 +1,49 @@
 <?php
+session_start();
+include 'conexion.php'; // Tu conexión a la base de datos
+
 // Obtenemos el tipo por GET
 $tipo = $_GET['tipo'] ?? 'imagen'; // Valor por defecto: imagen
 
 // Título según tipo
 $titulo = '';
-$categorias = [];
 
 switch ($tipo) {
     case 'video':
         $titulo = 'Categorías de Video';
-        $categorias = [
-            ['nombre' => 'ANIMALES', 'img' => 'imagenes/categorias/videos/animales.jpg'],
-            ['nombre' => 'PERSONAS', 'img' => 'imagenes/categorias/videos/personas.jpg'],
-            ['nombre' => 'DEPORTES', 'img' => 'imagenes/categorias/videos/deportes.jpg'],
-            ['nombre' => 'INFANTILES', 'img' => 'imagenes/categorias/videos/infantiles.jpg'],
-            ['nombre' => 'MOTIVACIONALES', 'img' => 'imagenes/categorias/videos/motivacionales.jpg'],
-            ['nombre' => 'CIUDADES', 'img' => 'imagenes/categorias/videos/ciudades.jpg']
-        ];
         break;
     case 'imagen':
         $titulo = 'Categorías de Imagen';
-        $categorias = [
-            ['nombre' => 'NATURALEZA', 'img' => 'imagenes/categorias/imagenes/naturaleza.jpg'],
-            ['nombre' => 'EDUCACIÓN', 'img' => 'imagenes/categorias/imagenes/educacion.jpg'],
-            ['nombre' => 'COMIDA Y BEBIDAS', 'img' => 'imagenes/categorias/imagenes/comidasybebidas.jpg'],
-            ['nombre' => 'DEPORTES', 'img' => 'imagenes/categorias/imagenes/deportes.jpg'],
-            ['nombre' => 'ARQUITECTURA', 'img' => 'imagenes/categorias/imagenes/arquitectura.jpg'],
-            ['nombre' => 'CIENCIA Y MEDICINA', 'img' => 'imagenes/categorias/imagenes/cienciaymedicina.jpg'],
-        ];
         break;
     case 'audio':
         $titulo = 'Categorías de Audio';
-        $categorias = [
-            ['nombre' => 'CANCIONES', 'img' => 'imagenes/categorias/audios/canciones.jpg'],
-            ['nombre' => 'EFECTOS', 'img' => 'imagenes/categorias/audios/efectos.jpg'],
-            ['nombre' => 'GRITOS', 'img' => 'imagenes/categorias/audios/gritos.jpg'],
-            ['nombre' => 'ANIMALES', 'img' => 'imagenes/categorias/audios/animales.jpg'],
-            ['nombre' => 'VEHICULOS', 'img' => 'imagenes/categorias/audios/vehiculos.jpg'],
-            ['nombre' => 'HIMNOS', 'img' => 'imagenes/categorias/audios/himnos.jpg'],
-        ];
         break;
     default:
         $titulo = 'Categorías';
 }
+
+// Ahora, traemos las categorías de la base de datos según el tipo
+$categorias = [];
+$stmt = $conexion->prepare("SELECT id_categoria, nombre, ruta_img FROM categoria WHERE tipo_prod = ?");
+$stmt->bind_param("s", $tipo);
+$stmt->execute();
+$resultado = $stmt->get_result();
+
+while ($row = $resultado->fetch_assoc()) {
+    $categorias[] = $row;
+}
+
+$stmt->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title><?= $titulo ?> | MediaShop</title>
+    <title><?= htmlspecialchars($titulo) ?> | MediaShop</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* Pegado desde tienda.php */
+        /* Estilos igual que tu plantilla */
         * {
             box-sizing: border-box;
             font-family: Arial, sans-serif;
@@ -151,12 +143,12 @@ switch ($tipo) {
 
 <!-- Categorías -->
 <div class="seccion-productos">
-    <h3><?= $titulo ?></h3>
+    <h3><?= htmlspecialchars($titulo) ?></h3>
     <div class="productos">
         <?php foreach ($categorias as $cat): ?>
-            <button class="producto" onclick="location.href='productos.php?tipo=<?= $tipo ?>&categoria=<?= urlencode($cat['nombre']) ?>'">
-                <img src="<?= $cat['img'] ?>" alt="<?= $cat['nombre'] ?>">
-                <p><?= $cat['nombre'] ?></p>
+            <button class="producto" onclick="location.href='productos.php?tipo=<?= urlencode($tipo) ?>&id_categoria=<?= urlencode($cat['id_categoria']) ?>'">
+                <img src="<?= htmlspecialchars($cat['ruta_img']) ?>" alt="<?= htmlspecialchars($cat['nombre']) ?>">
+                <p><?= htmlspecialchars($cat['nombre']) ?></p>
             </button>
         <?php endforeach; ?>
     </div>

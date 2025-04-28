@@ -1,70 +1,23 @@
-
 <?php
-$mostrar_titulo = false; // Estableces en false si no quieres que el título se muestre al incluirlo
-include('productos.php');
+include('conexion.php'); // Conectar a la base de datos
 
-$productos_todos = [
-    // tipo, subcategoria, id, nombre, imagen
-    ['tipo' => 'imagen', 'categoria' => 'NATURALEZA', 'id' => 101, 'nombre' => 'Montañas', 'img' => 'imagenes/categorias/imagenes/naturaleza/montanas.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'NATURALEZA', 'id' => 102, 'nombre' => 'Bosque', 'img' => 'imagenes/categorias/imagenes/naturaleza/bosque.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'NATURALEZA', 'id' => 103, 'nombre' => 'Desierto', 'img' => 'imagenes/categorias/imagenes/naturaleza/desierto.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'EDUCACION', 'id' => 104, 'nombre' => 'Colegio', 'img' => 'imagenes/categorias/imagenes/educacion/colegios.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'EDUCACION', 'id' => 105, 'nombre' => 'Profesor', 'img' => 'imagenes/categorias/imagenes/educacion/profesor.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'EDUCACION', 'id' => 106, 'nombre' => 'Libro', 'img' => 'imagenes/categorias/imagenes/educacion/libro.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'COMIDA Y BEBIDAS', 'id' => 107, 'nombre' => 'Gaseosa', 'img' => 'imagenes/categorias/imagenes/comidasybebidas/gaseosa.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'COMIDA Y BEBIDAS', 'id' => 108, 'nombre' => 'Lomo saltado', 'img' => 'imagenes/categorias/imagenes/comidasybebidas/lomos.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'COMIDA Y BEBIDAS', 'id' => 109, 'nombre' => 'Choripan', 'img' => 'imagenes/categorias/imagenes/comidasybebidas/choripan.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'DEPORTES', 'id' => 110, 'nombre' => 'Fútbol', 'img' => 'imagenes/categorias/imagenes/deportes/futbol.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'DEPORTES', 'id' => 111, 'nombre' => 'Natación', 'img' => 'imagenes/categorias/imagenes/deportes/natacion.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'DEPORTES', 'id' => 112, 'nombre' => 'Balonmano', 'img' => 'imagenes/categorias/imagenes/deportes/balonmano.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'ARQUITECTURA', 'id' => 113, 'nombre' => 'Templo antiguo', 'img' => 'imagenes/categorias/imagenes/arquitectura/temploantiguo.png'],
-    ['tipo' => 'imagen', 'categoria' => 'ARQUITECTURA', 'id' => 114, 'nombre' => 'Gótico', 'img' => 'imagenes/categorias/imagenes/arquitectura/gotico.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'ARQUITECTURA', 'id' => 115, 'nombre' => 'Coliseo romano', 'img' => 'imagenes/categorias/imagenes/arquitectura/coliseor.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'CIENCIA Y MEDICINA', 'id' => 116, 'nombre' => 'Virus', 'img' => 'imagenes/categorias/imagenes/cienciaymedicina/virus.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'CIENCIA Y MEDICINA', 'id' => 117, 'nombre' => 'Inyección', 'img' => 'imagenes/categorias/imagenes/cienciaymedicina/inyeccion.jpg'],
-    ['tipo' => 'imagen', 'categoria' => 'CIENCIA Y MEDICINA', 'id' => 118, 'nombre' => 'Doctor', 'img' => 'imagenes/categorias/imagenes/cienciaymedicina/doctor.jpg'],
+// Consultar productos aleatorios para "Recientemente añadidos"
+$sql = "SELECT id_prod, nombre_prod, ruta_preview, tipo_prod FROM producto ORDER BY RAND() LIMIT 6"; // Limitar a 6 productos aleatorios
+$result = $conexion->query($sql);
 
-    ['tipo' => 'video', 'categoria' => 'ANIMALES', 'id' => 201, 'nombre' => 'Perro aullando', 'img' => 'imagenes/categorias/videos/animales/perroaullando.jpg'],
-    ['tipo' => 'video', 'categoria' => 'ANIMALES', 'id' => 202, 'nombre' => 'Vida marina', 'img' => 'imagenes/categorias/videos/animales/vidamarina.jpg'],
-    ['tipo' => 'video', 'categoria' => 'ANIMALES', 'id' => 203, 'nombre' => 'Focas felices', 'img' => 'imagenes/categorias/videos/animales/focasfelices.jpg'],
-    ['tipo' => 'video', 'categoria' => 'PERSONAS', 'id' => 204, 'nombre' => 'Celbración de gol', 'img' => 'imagenes/categorias/videos/personas/gol.jpg'],
-    ['tipo' => 'video', 'categoria' => 'PERSONAS', 'id' => 205, 'nombre' => 'Hombre bailando', 'img' => 'imagenes/categorias/videos/personas/bailando.jpg'],
-    ['tipo' => 'video', 'categoria' => 'PERSONAS', 'id' => 206, 'nombre' => 'Mujer cocinando', 'img' => 'imagenes/categorias/videos/personas/cocinando.jpg'],
-    ['tipo' => 'video', 'categoria' => 'DEPORTES', 'id' => 207, 'nombre' => 'Partido de basquet', 'img' => 'imagenes/categorias/videos/deportes/basquet.jpg'],
-    ['tipo' => 'video', 'categoria' => 'DEPORTES', 'id' => 208, 'nombre' => 'Boxeadores', 'img' => 'imagenes/categorias/videos/deportes/box.jpg'],
-    ['tipo' => 'video', 'categoria' => 'DEPORTES', 'id' => 209, 'nombre' => 'Tenistas', 'img' => 'imagenes/categorias/videos/deportes/tennis.jpg'],
-    ['tipo' => 'video', 'categoria' => 'INFANTILES', 'id' => 210, 'nombre' => 'Pocoyo Corto', 'img' => 'imagenes/categorias/videos/infantiles/pocoyo.jpg'],
-    ['tipo' => 'video', 'categoria' => 'INFANTILES', 'id' => 211, 'nombre' => 'Tom y Jerry', 'img' => 'imagenes/categorias/videos/infantiles/tomyjerry.jpg'],
-    ['tipo' => 'video', 'categoria' => 'INFANTILES', 'id' => 212, 'nombre' => 'Paw Patrol', 'img' => 'imagenes/categorias/videos/infantiles/pawpatrol.jpg'],
-    ['tipo' => 'video', 'categoria' => 'MOTIVACIONALES', 'id' => 213, 'nombre' => 'Ibai motivación', 'img' => 'imagenes/categorias/videos/motivacionales/ibai.jpg'],
-    ['tipo' => 'video', 'categoria' => 'MOTIVACIONALES', 'id' => 214, 'nombre' => 'Llados', 'img' => 'imagenes/categorias/videos/motivacionales/llados.jpg'],
-    ['tipo' => 'video', 'categoria' => 'MOTIVACIONALES', 'id' => 215, 'nombre' => 'Conferencia', 'img' => 'imagenes/categorias/videos/motivacionales/conferencia.jpg'],
-    ['tipo' => 'video', 'categoria' => 'CIUDADES', 'id' => 216, 'nombre' => 'Lima', 'img' => 'imagenes/categorias/videos/ciudades/lima.jpg'],
-    ['tipo' => 'video', 'categoria' => 'CIUDADES', 'id' => 217, 'nombre' => 'Moscú', 'img' => 'imagenes/categorias/videos/ciudades/moscu.jpg'],
-    ['tipo' => 'video', 'categoria' => 'CIUDADES', 'id' => 218, 'nombre' => 'Barcelona', 'img' => 'imagenes/categorias/videos/ciudades/barcelona.jpg'],
-
-    ['tipo' => 'audio', 'categoria' => 'CANCIONES', 'id' => 301, 'nombre' => 'Hysteria', 'img' => 'imagenes/categorias/audios/canciones/hysteria.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'CANCIONES', 'id' => 302, 'nombre' => 'Cuánto me duele', 'img' => 'imagenes/categorias/audios/canciones/morat.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'CANCIONES', 'id' => 303, 'nombre' => 'No me conoce', 'img' => 'imagenes/categorias/audios/canciones/nomecoonoce.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'EFECTOS', 'id' => 304, 'nombre' => 'Rebote', 'img' => 'imagenes/categorias/audios/efectos/rebote.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'EFECTOS', 'id' => 305, 'nombre' => 'Impacto', 'img' => 'imagenes/categorias/audios/efectos/impacto.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'EFECTOS', 'id' => 306, 'nombre' => 'Zumbido', 'img' => 'imagenes/categorias/audios/efectos/zumbido.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'GRITOS', 'id' => 307, 'nombre' => 'Grito de terror mujer', 'img' => 'imagenes/categorias/audios/gritos/gritomujer.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'GRITOS', 'id' => 308, 'nombre' => 'Grito de terror hombre', 'img' => 'imagenes/categorias/audios/gritos/gritohombre.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'GRITOS', 'id' => 309, 'nombre' => 'Grito hinchada', 'img' => 'imagenes/categorias/audios/gritos/hinchadaal.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'ANIMALES', 'id' => 310, 'nombre' => 'Pájaros cantando', 'img' => 'imagenes/categorias/audios/animales/pajaros.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'ANIMALES', 'id' => 311, 'nombre' => 'Gato maullando', 'img' => 'imagenes/categorias/audios/animales/gato.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'ANIMALES', 'id' => 312, 'nombre' => 'Castor comiendo', 'img' => 'imagenes/categorias/audios/animales/castor.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'VEHICULOS', 'id' => 313, 'nombre' => 'Mustang', 'img' => 'imagenes/categorias/audios/vehiculos/mustang.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'VEHICULOS', 'id' => 314, 'nombre' => 'Moto acuática', 'img' => 'imagenes/categorias/audios/vehiculos/motoac.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'VEHICULOS', 'id' => 315, 'nombre' => 'Avión', 'img' => 'imagenes/categorias/audios/vehiculos/avion.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'HIMNOS', 'id' => 316, 'nombre' => 'Himno Perú', 'img' => 'imagenes/categorias/audios/himnos/peru.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'HIMNOS', 'id' => 317, 'nombre' => 'Himno Bolivia', 'img' => 'imagenes/categorias/audios/himnos/bolivia.jpg'],
-    ['tipo' => 'audio', 'categoria' => 'HIMNOS', 'id' => 318, 'nombre' => 'Himno Mongolia', 'img' => 'imagenes/categorias/audios/himnos/mongolia.jpg'],
-];
-
-$productos_recientes = array_slice($productos, 0, 7);
+// Verificar si hay productos
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $productos[] = $row;
+    }
+} else {
+    echo "No se encontraron productos.";
+}
 ?>
+
+
+
+
 
 
 <!DOCTYPE html>
@@ -292,15 +245,10 @@ $productos_recientes = array_slice($productos, 0, 7);
 
 <!-- Buscador central -->
 <!-- Buscador central con formulario -->
-<div class="second-search">
-    <form id="search-form" style="width: 100%; display: flex; justify-content: center;">
-        <input type="text" id="search-input" name="busqueda" placeholder="Buscar productos..." style="width: 50%; padding: 8px 12px; border-radius: 5px; border: 1px solid #ccc;">
-    </form>
+<input type="text" id="busqueda" placeholder="Buscar productos...">
+<div id="resultados_busqueda" style="position:absolute; background:white; width:100%; z-index:999; max-height:400px; overflow:auto;">
 </div>
 
-<div id="search-results" style="padding: 20px 40px; color: green; display: none;">
-    Buscando...
-</div>
 
 
 
@@ -326,94 +274,37 @@ $productos_recientes = array_slice($productos, 0, 7);
 </div>
 
 <!-- Recientemente añadidos -->
+<!-- Recientemente añadidos -->
 <div class="seccion-productos">
     <h3>Recientemente añadidos</h3>
     <div class="productos">
-        <!-- Producto 1 -->
-        <button class="producto" onclick="window.location='detalle_imagen.php?id=101'">
-            <img src="imagenes/categorias/imagenes/naturaleza/montanas.jpg" alt="Montañas">
-            <p>Montañas</p>
-        </button>
-
-        <!-- Producto 2 -->
-        <button class="producto" onclick="window.location='detalle_imagen.php?id=115'">
-            <img src="imagenes/categorias/imagenes/arquitectura/coliseor.jpg" alt="Coliseo romano">
-            <p>Coliseo Romano</p>
-        </button>
-
-        <!-- Producto 3 -->
-        <button class="producto" onclick="window.location='detalle_video.php?id=218'">
-            <img src="imagenes/categorias/videos/ciudades/barcelona.jpg" alt="Barcelona">
-            <p>Barcelona</p>
-        </button>
-
-        <!-- Producto 4 -->
-        <button class="producto" onclick="window.location='detalle_audio.php?id=307'">
-            <img src="imagenes/categorias/audios/gritos/gritomujer.jpg" alt="Grito terror mujer">
-            <p>Grito terror mujer</p>
-        </button>
-
-        <!-- Producto 5 -->
-        <button class="producto" onclick="window.location='detalle_audio.php?id=316'">
-            <img src="imagenes/categorias/audios/himnos/peru.jpg" alt="Himno Peru">
-            <p>Himno Perú</p>
-        </button>
-
-        <!-- Producto 6 -->
-        <button class="producto" onclick="window.location='detalle_video.php?id=217'">
-            <img src="imagenes/categorias/videos/ciudades/moscu.jpg" alt="Moscu">
-            <p>Moscú</p>
-        </button>
-
-        <!-- Producto 7 -->
-        <button class="producto" onclick="window.location='detalle_video.php?id=210'">
-            <img src="imagenes/categorias/videos/infantiles/pocoyo.jpg" alt="Pocoyo">
-            <p>Pocoyo Corto</p>
-        </button>
+        <?php foreach ($productos as $producto) { ?>
+            <button class="producto" 
+                onclick="window.location='<?php echo ($producto['tipo_prod'] == 'videos') ? 'detalle_video.php' : (($producto['tipo_prod'] == 'audios') ? 'detalle_audio.php' : 'detalle_imagen.php'); ?>?id=<?php echo $producto['id_prod']; ?>'">
+                <img src="imagenes/categorias/<?php echo $producto['tipo_prod']; ?>/<?php echo $producto['ruta_preview']; ?>" 
+                     alt="<?php echo $producto['nombre_prod']; ?>">
+                <p><?php echo $producto['nombre_prod']; ?></p>
+            </button>
+        <?php } ?>
     </div>
 </div>
-
 
 <!-- Promociones -->
 <div class="seccion-productos">
     <h3>Promociones</h3>
     <div class="productos">
-        <button class="producto" onclick="window.location='detalle_audio.php?id=306'">
-            <img src="imagenes/categorias/audios/efectos/zumbido.jpg" alt="Tienda">
-            <p>Zumbido</p>
-        </button>
-
-        <button class="producto" onclick="window.location='detalle_imagen.php?id=107'">
-            <img src="imagenes/categorias/imagenes/comidasybebidas/gaseosa.jpg" alt="Átomo">
-            <p>Gaseosa</p>
-        </button>
-
-        <button class="producto" onclick="window.location='detalle_video.php?id=204'">
-            <img src="imagenes/categorias/videos/personas/gol.jpg" alt="Coca-Cola">
-            <p>Celebración de gol</p>
-        </button>
-
-        <button class="producto" onclick="window.location='detalle_audio.php?id=303'">
-            <img src="imagenes/categorias/audios/canciones/nomecoonoce.jpg" alt="Laptops">
-            <p>No me conoce</p>
-        </button>
-
-        <button class="producto" onclick="window.location='detalle_imagen.php?id=111'">
-            <img src="imagenes/categorias/imagenes/deportes/natacion.jpg" alt="Piscina">
-            <p>Natación</p>
-        </button>
-
-        <button class="producto" onclick="window.location='detalle_video.php?id=212'">
-            <img src="imagenes/categorias/videos/infantiles/pawpatrol.jpg" alt="Luigi">
-            <p>Paw Patrol</p>
-        </button>
-
-        <button class="producto" onclick="window.location='detalle_audio.php?id=309'">
-            <img src="imagenes/categorias/audios/gritos/hinchadaal.jpg" alt="Playa">
-            <p>Grito hinchada</p>
-        </button>
+        <?php foreach ($productos as $producto) { ?>
+            <button class="producto" 
+                onclick="window.location='<?php echo ($producto['tipo_prod'] == 'videos') ? 'detalle_video.php' : (($producto['tipo_prod'] == 'audios') ? 'detalle_audio.php' : 'detalle_imagen.php'); ?>?id=<?php echo $producto['id_prod']; ?>'">
+                <img src="imagenes/categorias/<?php echo $producto['tipo_prod']; ?>/<?php echo $producto['ruta_preview']; ?>" 
+                     alt="<?php echo $producto['nombre_prod']; ?>">
+                <p><?php echo $producto['nombre_prod']; ?></p>
+            </button>
+        <?php } ?>
     </div>
 </div>
+
+
 
 
 <!-- Footer -->
@@ -454,6 +345,27 @@ $productos_recientes = array_slice($productos, 0, 7);
 <div class="copy-bar">
     © 2025 MediaShop - Todos los derechos reservados
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function(){
+    $("#busqueda").keyup(function(){
+        var texto = $(this).val();
+        if(texto != ""){
+            $.ajax({
+                url: "buscar_productos.php",
+                method: "POST",
+                data: { busqueda: texto },
+                success: function(data){
+                    $("#resultados_busqueda").html(data);
+                }
+            });
+        } else {
+            $("#resultados_busqueda").html("");
+        }
+    });
+});
+</script>
 
 
 
